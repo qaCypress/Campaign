@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Check Campaign</title>
+  <script src="https://apis.google.com/js/api.js"></script>
+  <script src="https://apis.google.com/js/client.js?onload=handleClientLoad"></script>
+  <script src = "connectToDoc.js"></script>
+  <script src = "index.js"></script>
+  
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <h1>Check the campaign</h1>
+
+
+    <div class="input-container">
+        <div class="checkbox-container">
+        </div>
+        
+        <input type="text" id="campaign-input" placeholder="Enter Campaign ID" value="">
+        <button onclick="getCampaign(document.getElementById('campaign-input').value, document.getElementById('dropdown-menu').value)">Get Campaign Data</button>
+        <label class="checkbox-label">
+            <input type="checkbox" class="custom-checkbox" onclick="toggleTableVisibility()">
+            Hide Campaign Data Table
+          </label>
+
+
+        <div class="dropdown-container">
+            <select id="dropdown-menu">
+                <option value="allrightcasino.nas">AllRight</option>
+                <option value="luckybirdcasino.nas">LuckyBird</option>
+                <option value="slottica.nas">Slottica</option>
+                <option value="slottyway.nas">SlottyWay</option>
+                <option value="spinamba.nas">Spinamba</option>
+                <option value="redbox.nas">SuperCat</option>
+                <option value="spinbounty.nas">SpinBounty</option>
+                <option value="viks.nas">Viks</option>
+                <option value="spinado.sof">Spinado</option>
+            </select>
+        </div>
+      </div>
+      
+
+      <h2 id = "campaign-heading">Campaign Data Table</h1>
+    <table id="data-table">
+      <thead>
+        <tr>
+          <th>Properties</th>
+          <th>Doc data</th>
+          <th>Cms data</th>
+          <th>BO data</th>
+        </tr>
+      </thead>
+      <tbody id="table-body">
+        <!-- Populated dynamically with API data -->
+      </tbody>
+    </table>
+
+    <h2>Translations Data Table</h1>
+
+        <div class="responsive-table">
+            <table id="translations-table">
+              <thead>
+                <tr>
+                  <th>Language</th>
+                  <th>Title</th>
+                  <th>Short Description</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tbody id="table-body-trans">
+                <!-- Populated dynamically with API data -->
+              </tbody>
+            </table>
+          </div>
+</body>
+</html>

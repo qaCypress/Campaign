@@ -4,7 +4,6 @@ function getCampaign(CAMPAIGN, PROJECT) {
 
     clearInput()
     refreshTable();
-    fetchdocdata()
     Promise.all([
         fetch(`https://${PROJECT}cms.co/api/bonus/info/uuids=${CAMPAIGN}`).then(response => response.json()),
         fetch(`https://${PROJECT}cms.co/api/bonus/info/${CAMPAIGN}/CAMPAIGN`).then(response => response.json())
@@ -13,6 +12,18 @@ function getCampaign(CAMPAIGN, PROJECT) {
             if (!Array.isArray(data2)) {
                 data2 = [data2];
               }
+
+              const dataArray = [
+                ['Book of Kemet', '10', 'CAMPAIGN-45ecee3b-2ba5-40c0-a963-d70937990e5e'],
+                ['Book of Ra', '15', 'CAMPAIGN-123456'],
+                ['Starburst', '5', 'CAMPAIGN-7890']
+              ];
+              
+              // Find the array that contains the specified value
+              const searchTerm = 'CAMPAIGN-45ecee3b-2ba5-40c0-a963-d70937990e5e';
+              //const foundArray =  fetchdocdata().find(item => item.includes(CAMPAIGN));
+            
+              console.log(fetchdocdata().then(data => {return data.valuee}));
     
           // Merge the two datasets
           const mergedData = [...data1, ...data2];
@@ -58,16 +69,17 @@ function getCampaign(CAMPAIGN, PROJECT) {
 
 function fetchdocdata() {
     const apiKey = 'AIzaSyDq2L4D73Y5E9jqyN3jk67b9xE-xzghqkE';
-    const sheetId = '1TwnAVc3yHllchsywcD3hAbh2MKMju4bx9MuqisYWW84';
-    const range = 'B1:B2'; // Specify the range of data to retrieve
+    const sheetId = '1Ki7_umFCqQvwWH-s9gExvnbomP3bUrYW3s0VTv5aIpg';
+    const range = 'A2:C7'; // Specify the range of data to retrieve
     
-    const url = `https://sheets.googleapis.com/v4/spreadsheets/1_uvJOLvFZ-S-wQXOxUrM4-qxgegYraUUW6-59hgHO2s/values:batchGet?ranges=H3:H10&ranges=D3:D10&key=AIzaSyCNMwgRQjntdquqKkb52r_2jcgpMQb0LXw`;
+    const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${range}?key=${apiKey}`
     
-    fetch(url)
+    return fetch(url)
       .then(response => response.json())
       .then(data => {
         // Process the retrieved data and populate your HTML table
-        console.log(data.values); // Example: log the values to the console
+        //console.log(data.values); // Example: log the values to the console
+        return data.values;
       })
       .catch(error => {
         console.error('Error:', error);
@@ -128,32 +140,32 @@ function getSortedTrans(data) {
 
 
 function formatAPIText(apiText) {
-    const container = document.createElement('div');
-    container.classList.add('cms-text');
-  
-    const variableRegex = /{%\s*"(.*?)":\s*"(.*?)".*?%}/g;
-    const numberRegex = /\b\d+\b/g; // Regular expression to match numbers
-  
-    let modifiedText = apiText.replace(variableRegex, '<a class="variable" data-variable="$1" href="#">{$1}</a>');
-  
-    // Replace numbers with highlighted numbers
-    modifiedText = modifiedText.replace(numberRegex, '<span class="highlighted-number">$&</span>');
-  
-    container.innerHTML = modifiedText;
-  
-    container.addEventListener('click', function(event) {
-      const target = event.target;
-      if (target.classList.contains('variable')) {
-        const variable = target.getAttribute('data-variable');
-        const variableElements = container.querySelectorAll(`span[data-variable="${variable}"]`);
-        variableElements.forEach(function(element) {
-          element.classList.toggle('hidden');
-        });
-      }
-    });
-  
-    return container.innerHTML;
-  }
+  const container = document.createElement('div');
+  container.classList.add('cms-text');
+
+  const variableRegex = /{%\s*"(.*?)":\s*"(.*?)".*?%}/g;
+  const numberRegex = /\b\d+\b/g; // Regular expression to match numbers
+
+  let modifiedText = apiText.replace(variableRegex, '<a class="variable" data-variable="$1" href="#">{$1}</a>');
+
+  // Replace numbers with highlighted numbers
+  modifiedText = modifiedText.replace(numberRegex, '<span class="highlighted-number">$&</span>');
+
+  container.innerHTML = modifiedText;
+
+  container.addEventListener('click', function(event) {
+    const target = event.target;
+    if (target.classList.contains('variable')) {
+      const variable = target.getAttribute('data-variable');
+      const variableElements = container.querySelectorAll(`a.variable[data-variable="${variable}"]`);
+      variableElements.forEach(function(element) {
+        element.nextElementSibling.classList.toggle('hidden');
+      });
+    }
+  });
+
+  return container.innerHTML;
+}
 
 function clearInput() {
     document.getElementById('campaign-input').value = '';
@@ -177,29 +189,6 @@ function refreshTable() {
 
 
 
-/*
-async function loadIntoTable(url, table) {
-    const tableHead = table.querySelector("thead")
-    const tableBody = table.querySelector("tbody")
-    const response = await fetch(url)
-    const {headers, rows} = await response.json()
-
-    //Clear the table
-    tableHead.innerHTML = "<tr></tr>"
-    tableHead.innerHTML = ""
-
-    headerss = {"headerss": ['ds','ds']}
-
-    for (const headerText of headerss) {
-        const headerElement = document.createElement('th')
-
-        headerElement.textContent = headerText
-        tableHead.querySelector("tr").appendChild(headerElement)
-    }
-
-}
-
-loadIntoTable("https://allrightcasino.nascms.co/api/bonus/info/uuids=CAMPAIGN-7b136172-01b5-4290-b30e-6add18a6b506", document.querySelector("table"))*/
 
 
 

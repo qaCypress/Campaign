@@ -6,27 +6,44 @@ function getCampaign(CAMPAIGN, PROJECT) {
     refreshTable();
     Promise.all([
         fetch(`https://${PROJECT}cms.co/api/bonus/info/uuids=${CAMPAIGN}`).then(response => response.json()),
-        fetch(`https://${PROJECT}cms.co/api/bonus/info/${CAMPAIGN}/CAMPAIGN`).then(response => response.json())
+        fetch(`https://${PROJECT}cms.co/api/bonus/info/${CAMPAIGN}/CAMPAIGN`).then(response => response.json()),
+        fetchdocdata()
       ])
-        .then(([data1, data2]) => {
+        .then(([data1, data2, data3]) => {
             if (!Array.isArray(data2)) {
                 data2 = [data2];
               }
+         
+              let docApi
+              fetchdocdata()
+              .then(result => {
+                console.log(result);
+                // Use the jsonData as needed
+              })
 
-              const dataArray = [
-                ['Book of Kemet', '10', 'CAMPAIGN-45ecee3b-2ba5-40c0-a963-d70937990e5e'],
-                ['Book of Ra', '15', 'CAMPAIGN-123456'],
-                ['Starburst', '5', 'CAMPAIGN-7890']
-              ];
+              const transformedData = {};
+
+              // Iterate over the data rows starting from index 1
+              for (let i = 1; i < data3.length; i++) {
+                const row = data3[i];
+                
+                // Iterate over the row elements
+                for (let j = 0; j < row.length; j++) {
+                  const key = data3[0][j]; // Use the first row as keys
+                  const value = row[j];
+                  
+                  if (!transformedData[key]) {
+                    transformedData[key] = [];
+                  }
+                  
+                  transformedData[key].push(value);
+                }
+              }
               
-              // Find the array that contains the specified value
-              const searchTerm = 'CAMPAIGN-45ecee3b-2ba5-40c0-a963-d70937990e5e';
-              //const foundArray =  fetchdocdata().find(item => item.includes(CAMPAIGN));
-            
-              console.log(fetchdocdata().then(data => {return data.valuee}));
+              console.log(transformedData);              
     
           // Merge the two datasets
-          const mergedData = [...data1, ...data2];
+          const mergedData = [data1, data2, transformedData];
       
           // Process and use the merged data
           console.log(mergedData);
@@ -34,11 +51,26 @@ function getCampaign(CAMPAIGN, PROJECT) {
           // Populate the table with the merged data
           const tableBody = document.getElementById('table-body');
     
-          let prop = ["GameName", "FS count", "Restricts"]
+          let prop = ["GameName", "FS count", "Restricts", "Spin Price"]
+
+          let getCamp = null
+          for (let i = 0; i < transformedData.Campaign.length; i++) {
+            if (transformedData.Campaign[i] === CAMPAIGN) {
+              getCamp = i;
+              break;
+            }
+          }
+          let DocData = [transformedData.Games[getCamp], transformedData.FS[getCamp], "-", transformedData.FS_price[getCamp]]
+
+          let CmsData = ["-", data1[0].translations.title.no, data1[0].restrictedCountries, "-"]
     
-          let CmsData = ["-", data1[0].translations.title.no, data1[0].restrictedCountries]
-    
-          let BOData = [data2[0].additionalInfo.templates[0].game, data2[0].additionalInfo.templates[0].freeSpinsAmount, '-']
+          let freeSpinCondition = [
+            data2[0].additionalInfo.templates[0].freeSpinPrice && data2[0].additionalInfo.templates[0].freeSpinPrice['EUR'] !== undefined
+            ? data2[0].additionalInfo.templates[0].freeSpinPrice['EUR']
+            : '-'
+          ]
+          
+          let BOData = [data2[0].additionalInfo.templates[0].game, data2[0].additionalInfo.templates[0].freeSpinsAmount, '-', freeSpinCondition[0]]
     
           for (let i = 0; i < prop.length; i++) {
             const row = document.createElement('tr');
@@ -48,7 +80,7 @@ function getCampaign(CAMPAIGN, PROJECT) {
             const boData = document.createElement('td');
       
             propData.textContent = prop[i]
-            docData.textContent = "";
+            docData.textContent = DocData[i];
             cmsData.textContent = CmsData[i]
             boData.textContent = BOData[i];
       
@@ -70,7 +102,7 @@ function getCampaign(CAMPAIGN, PROJECT) {
 function fetchdocdata() {
     const apiKey = 'AIzaSyDq2L4D73Y5E9jqyN3jk67b9xE-xzghqkE';
     const sheetId = '1Ki7_umFCqQvwWH-s9gExvnbomP3bUrYW3s0VTv5aIpg';
-    const range = 'A2:C7'; // Specify the range of data to retrieve
+    const range = 'A1:D7'; // Specify the range of data to retrieve
     
     const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${range}?key=${apiKey}`
     
@@ -93,7 +125,6 @@ function translationsData(data1, data2) {
     
 
     let languages = Object.keys(data1[0].translations.title).sort()
-    console.log(languages)
 
 
 

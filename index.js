@@ -61,7 +61,7 @@ function fetchdocdata() {
     const sheetId = '1TwnAVc3yHllchsywcD3hAbh2MKMju4bx9MuqisYWW84';
     const range = 'B1:B2'; // Specify the range of data to retrieve
     
-    const url = `https://sheets.googleapis.com/v4/spreadsheets/1_uvJOLvFZ-S-wQXOxUrM4-qxgegYraUUW6-59hgHO2s/values:batchGet?ranges=H3:H10&ranges=D3:D10&key=AIzaSyCNMwgRQjntdquqKkb52r_2jcgpMQb0LXw`;
+    const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${range}?key=${apiKey}`;
     
     fetch(url)
       .then(response => response.json())

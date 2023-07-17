@@ -226,3 +226,7 @@ body {
     .checkbox-label span {
         margin-top: 20px; /* Adjust this value to move the text upwards */
     }
+
+    .show-all-data .hidden {
+      display: inline; /* Change the display property to show the hidden elements */
+    }

@@ -4,37 +4,45 @@
 // Load the Google Sheets API library
 gapi.load('client', initClient);
 
-// Initialize the API client
 function initClient() {
-  gapi.client.init({
-    apiKey: 'AIzaSyDq2L4D73Y5E9jqyN3jk67b9xE-xzghqkE',
-    clientId: '1073747679642-cq0q4aveq98jsjnqb19ae0ckiit5u2ep.apps.googleusercontent.com',
-    discoveryDocs: ['https://sheets.googleapis.com/$discovery/rest?version=v4'],
-    scope: 'https://www.googleapis.com/auth/spreadsheets.readonly'
-  }).then(function() {
-    // Authorize and make API requests
-    gapi.auth2.getAuthInstance().signIn().then(function() {
-      // Authenticated successfully
-      // Make API requests
-      getDataFromSheet();
+    gapi.client.init({
+      apiKey: 'AIzaSyAIoEE_zYqRZ8Ca_AmEOI8XX1-BEIY9lU0',
+      clientId: '316367094902-lne2l4k2dl9giqtn758ddhfpij8asv7q.apps.googleusercontent.com',
+      discoveryDocs: ['https://sheets.googleapis.com/$discovery/rest?version=v4'],
+      scope: 'https://www.googleapis.com/auth/spreadsheets.readonly'
+    }).then(() => {
+      // API is initialized and ready to be used
+      // Call the function to load data from the spreadsheet
+      loadSpreadsheetData();
+    }).catch((error) => {
+      // Error occurred during initialization
+      console.log('Error initializing API:', error);
     });
-  });
-}
+  }
+  
+  function handleClientLoad() {
+    gapi.load('client', initClient);
+  }
 
-// Fetch data from Google Sheets
-function getDataFromSheet() {
-  gapi.client.sheets.spreadsheets.values.get({
-    spreadsheetId: '1TwnAVc3yHllchsywcD3hAbh2MKMju4bx9MuqisYWW84',
-    range: 'Sho!A1:B5' // Specify the range you want to read
-  }).then(function(response) {
-    var values = response.result.values;
-    if (values.length > 0) {
-      // Process the retrieved data
-      console.log('Data from Google Sheets:', values);
-    } else {
-      console.log('No data found.');
-    }
-  }, function(error) {
-    console.error('Error fetching data:', error);
-  });
-}
+
+
+
+
+
+function loadSpreadsheetData() {
+    gapi.client.sheets.spreadsheets.values.get({
+      spreadsheetId: '1TwnAVc3yHllchsywcD3hAbh2MKMju4bx9MuqisYWW84',
+      range: 'Лист1!A1:AF23' // Specify the range of cells you want to retrieve
+    }).then((response) => {
+      var values = response.result.values;
+      if (values.length > 0) {
+        // Process the retrieved values
+        console.log(values);
+      } else {
+        console.log('No data found.');
+      }
+    }).catch((error) => {
+      console.log('Error loading data from spreadsheet:', error);
+    });
+  }
+

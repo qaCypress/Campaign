@@ -4,18 +4,46 @@ function getCampaign(CAMPAIGN, PROJECT) {
 
     clearInput()
     refreshTable();
-    fetchdocdata()
     Promise.all([
         fetch(`https://${PROJECT}cms.co/api/bonus/info/uuids=${CAMPAIGN}`).then(response => response.json()),
-        fetch(`https://${PROJECT}cms.co/api/bonus/info/${CAMPAIGN}/CAMPAIGN`).then(response => response.json())
+        fetch(`https://${PROJECT}cms.co/api/bonus/info/${CAMPAIGN}/CAMPAIGN`).then(response => response.json()),
+        fetchdocdata()
       ])
-        .then(([data1, data2]) => {
+        .then(([data1, data2, data3]) => {
             if (!Array.isArray(data2)) {
                 data2 = [data2];
               }
+         
+              let docApi
+              fetchdocdata()
+              .then(result => {
+                console.log(result);
+                // Use the jsonData as needed
+              })
+
+              const transformedData = {};
+
+              // Iterate over the data rows starting from index 1
+              for (let i = 1; i < data3.length; i++) {
+                const row = data3[i];
+                
+                // Iterate over the row elements
+                for (let j = 0; j < row.length; j++) {
+                  const key = data3[0][j]; // Use the first row as keys
+                  const value = row[j];
+                  
+                  if (!transformedData[key]) {
+                    transformedData[key] = [];
+                  }
+                  
+                  transformedData[key].push(value);
+                }
+              }
+              
+              console.log(transformedData);              
     
           // Merge the two datasets
-          const mergedData = [...data1, ...data2];
+          const mergedData = [data1, data2, transformedData];
       
           // Process and use the merged data
           console.log(mergedData);
@@ -23,11 +51,26 @@ function getCampaign(CAMPAIGN, PROJECT) {
           // Populate the table with the merged data
           const tableBody = document.getElementById('table-body');
     
-          let prop = ["GameName", "FS count", "Restricts"]
+          let prop = ["GameName", "FS count", "Restricts", "Spin Price"]
+
+          let getCamp = null
+          for (let i = 0; i < transformedData.Campaign.length; i++) {
+            if (transformedData.Campaign[i] === CAMPAIGN) {
+              getCamp = i;
+              break;
+            }
+          }
+          let DocData = [transformedData.Games[getCamp], transformedData.FS[getCamp], "-", transformedData.FS_price[getCamp]]
+
+          let CmsData = ["-", data1[0].translations.title.no, data1[0].restrictedCountries, "-"]
     
-          let CmsData = ["-", data1[0].translations.title.no, data1[0].restrictedCountries]
-    
-          let BOData = [data2[0].additionalInfo.templates[0].game, data2[0].additionalInfo.templates[0].freeSpinsAmount, '-']
+          let freeSpinCondition = [
+            data2[0].additionalInfo.templates[0].freeSpinPrice && data2[0].additionalInfo.templates[0].freeSpinPrice['EUR'] !== undefined
+            ? data2[0].additionalInfo.templates[0].freeSpinPrice['EUR']
+            : '-'
+          ]
+          
+          let BOData = [data2[0].additionalInfo.templates[0].game, data2[0].additionalInfo.templates[0].freeSpinsAmount, '-', freeSpinCondition[0]]
     
           for (let i = 0; i < prop.length; i++) {
             const row = document.createElement('tr');
@@ -37,7 +80,7 @@ function getCampaign(CAMPAIGN, PROJECT) {
             const boData = document.createElement('td');
       
             propData.textContent = prop[i]
-            docData.textContent = "";
+            docData.textContent = DocData[i];
             cmsData.textContent = CmsData[i]
             boData.textContent = BOData[i];
       
@@ -58,16 +101,17 @@ function getCampaign(CAMPAIGN, PROJECT) {
 
 function fetchdocdata() {
     const apiKey = 'AIzaSyDq2L4D73Y5E9jqyN3jk67b9xE-xzghqkE';
-    const sheetId = '1TwnAVc3yHllchsywcD3hAbh2MKMju4bx9MuqisYWW84';
-    const range = 'B1:B2'; // Specify the range of data to retrieve
+    const sheetId = '1Ki7_umFCqQvwWH-s9gExvnbomP3bUrYW3s0VTv5aIpg';
+    const range = 'A:AI'; // Specify the range of data to retrieve
     
-    const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${range}?key=${apiKey}`;
+    const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${range}?key=${apiKey}`
     
-    fetch(url)
+    return fetch(url)
       .then(response => response.json())
       .then(data => {
         // Process the retrieved data and populate your HTML table
-        console.log(data.values); // Example: log the values to the console
+        //console.log(data.values); // Example: log the values to the console
+        return data.values;
       })
       .catch(error => {
         console.error('Error:', error);
@@ -81,7 +125,6 @@ function translationsData(data1, data2) {
     
 
     let languages = Object.keys(data1[0].translations.title).sort()
-    console.log(languages)
 
 
 
@@ -128,32 +171,32 @@ function getSortedTrans(data) {
 
 
 function formatAPIText(apiText) {
-    const container = document.createElement('div');
-    container.classList.add('cms-text');
-  
-    const variableRegex = /{%\s*"(.*?)":\s*"(.*?)".*?%}/g;
-    const numberRegex = /\b\d+\b/g; // Regular expression to match numbers
-  
-    let modifiedText = apiText.replace(variableRegex, '<a class="variable" data-variable="$1" href="#">{$1}</a>');
-  
-    // Replace numbers with highlighted numbers
-    modifiedText = modifiedText.replace(numberRegex, '<span class="highlighted-number">$&</span>');
-  
-    container.innerHTML = modifiedText;
-  
-    container.addEventListener('click', function(event) {
-      const target = event.target;
-      if (target.classList.contains('variable')) {
-        const variable = target.getAttribute('data-variable');
-        const variableElements = container.querySelectorAll(`span[data-variable="${variable}"]`);
-        variableElements.forEach(function(element) {
-          element.classList.toggle('hidden');
-        });
-      }
-    });
-  
-    return container.innerHTML;
-  }
+  const container = document.createElement('div');
+  container.classList.add('cms-text');
+
+  const variableRegex = /{%\s*"(.*?)":\s*"(.*?)".*?%}/g;
+  const numberRegex = /\b\d+\b/g; // Regular expression to match numbers
+
+  let modifiedText = apiText.replace(variableRegex, '<a class="variable" data-variable="$1" href="#">{$1}</a>');
+
+  // Replace numbers with highlighted numbers
+  modifiedText = modifiedText.replace(numberRegex, '<span class="highlighted-number">$&</span>');
+
+  container.innerHTML = modifiedText;
+
+  container.addEventListener('click', function(event) {
+    const target = event.target;
+    if (target.classList.contains('variable')) {
+      const variable = target.getAttribute('data-variable');
+      const variableElements = container.querySelectorAll(`a.variable[data-variable="${variable}"]`);
+      variableElements.forEach(function(element) {
+        element.nextElementSibling.classList.toggle('hidden');
+      });
+    }
+  });
+
+  return container.innerHTML;
+}
 
 function clearInput() {
     document.getElementById('campaign-input').value = '';
@@ -177,29 +220,6 @@ function refreshTable() {
 
 
 
-/*
-async function loadIntoTable(url, table) {
-    const tableHead = table.querySelector("thead")
-    const tableBody = table.querySelector("tbody")
-    const response = await fetch(url)
-    const {headers, rows} = await response.json()
-
-    //Clear the table
-    tableHead.innerHTML = "<tr></tr>"
-    tableHead.innerHTML = ""
-
-    headerss = {"headerss": ['ds','ds']}
-
-    for (const headerText of headerss) {
-        const headerElement = document.createElement('th')
-
-        headerElement.textContent = headerText
-        tableHead.querySelector("tr").appendChild(headerElement)
-    }
-
-}
-
-loadIntoTable("https://allrightcasino.nascms.co/api/bonus/info/uuids=CAMPAIGN-7b136172-01b5-4290-b30e-6add18a6b506", document.querySelector("table"))*/
 
 
 

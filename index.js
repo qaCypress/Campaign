@@ -1,7 +1,7 @@
 import {CheckCond} from "tableCodition.js";
 
 function getCampaign(CAMPAIGN, PROJECT) {
-  //Прив
+  //Прив да-да
     clearInput()
     refreshTable();
     Promise.all([

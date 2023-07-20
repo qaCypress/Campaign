@@ -1,7 +1,7 @@
-
+import {CheckCond} from "tableCodition.js";
 
 function getCampaign(CAMPAIGN, PROJECT) {
-
+  //Прив
     clearInput()
     refreshTable();
     Promise.all([
@@ -69,6 +69,11 @@ function getCampaign(CAMPAIGN, PROJECT) {
             ? data2[0].additionalInfo.templates[0].freeSpinPrice['EUR']
             : '-'
           ]
+          
+          console.log(CheckCond(data2))
+          console.log(freeSpinCondition[0])
+
+  
           
           let BOData = [data2[0].additionalInfo.templates[0].game, data2[0].additionalInfo.templates[0].freeSpinsAmount, '-', freeSpinCondition[0]]
     

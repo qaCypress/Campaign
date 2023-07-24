@@ -60,7 +60,8 @@ function getCampaign(CAMPAIGN, PROJECT) {
               break;
             }
           }
-          let DocData = [transformedData.Games[getCamp], transformedData.FS[getCamp], "-", transformedData.FS_price[getCamp]]
+          console.log( transformedData.FS_price[getCamp])
+          let DocData = [transformedData.Games[getCamp], transformedData.FS[getCamp], transformedData.Restricts[getCamp], transformedData.FS_price[getCamp]]
 
           let CmsData = ["-", data1[0].translations.title.no, data1[0].restrictedCountries, "-"]
     
@@ -102,7 +103,7 @@ function getCampaign(CAMPAIGN, PROJECT) {
 function fetchdocdata() {
     const apiKey = 'AIzaSyDq2L4D73Y5E9jqyN3jk67b9xE-xzghqkE';
     const sheetId = '1Ki7_umFCqQvwWH-s9gExvnbomP3bUrYW3s0VTv5aIpg';
-    const range = 'A1:D7'; // Specify the range of data to retrieve
+    const range = 'A:AF'; // Specify the range of data to retrieve
     
     const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${range}?key=${apiKey}`
     

@@ -1,7 +1,7 @@
-import {CheckCond} from "tableCodition.js";
 
+
+//Основна функція, в якій виводиться вся інфа
 function getCampaign(CAMPAIGN, PROJECT) {
-  //Прив да-да
     clearInput()
     refreshTable();
     Promise.all([
@@ -9,9 +9,9 @@ function getCampaign(CAMPAIGN, PROJECT) {
         fetch(`https://${PROJECT}cms.co/api/bonus/info/${CAMPAIGN}/CAMPAIGN`).then(response => response.json()),
         fetchdocdata()
       ])
-        .then(([data1, data2, data3]) => {
-            if (!Array.isArray(data2)) {
-                data2 = [data2];
+        .then(([CmsApi, BoApi, DocApi]) => {
+            if (!Array.isArray(BoApi)) {
+                BoApi = [BoApi];
               }
          
               let docApi
@@ -24,12 +24,12 @@ function getCampaign(CAMPAIGN, PROJECT) {
               const transformedData = {};
 
               // Iterate over the data rows starting from index 1
-              for (let i = 1; i < data3.length; i++) {
-                const row = data3[i];
+              for (let i = 1; i < DocApi.length; i++) {
+                const row = DocApi[i];
                 
                 // Iterate over the row elements
                 for (let j = 0; j < row.length; j++) {
-                  const key = data3[0][j]; // Use the first row as keys
+                  const key = DocApi[0][j]; // Use the first row as keys
                   const value = row[j];
                   
                   if (!transformedData[key]) {
@@ -43,7 +43,7 @@ function getCampaign(CAMPAIGN, PROJECT) {
               console.log(transformedData);              
     
           // Merge the two datasets
-          const mergedData = [data1, data2, transformedData];
+          const mergedData = [CmsApi, BoApi, transformedData];
       
           // Process and use the merged data
           console.log(mergedData);
@@ -51,32 +51,26 @@ function getCampaign(CAMPAIGN, PROJECT) {
           // Populate the table with the merged data
           const tableBody = document.getElementById('table-body');
     
-          let prop = ["GameName", "FS count", "Restricts", "Spin Price"]
+          let prop = ["GameName", "FS_count", "Restricts", "Allowed", "Spin_Price"]
 
           let getCamp = null
-          for (let i = 0; i < transformedData.Campaign.length; i++) {
-            if (transformedData.Campaign[i] === CAMPAIGN) {
-              getCamp = i;
-              break;
+          if(getCamp !== null) {
+            for (let i = 0; i < transformedData.Campaign.length; i++) {
+              if (transformedData.Campaign[i] === CAMPAIGN) {
+                getCamp = i;
+                break;
+              }
             }
           }
-          console.log( transformedData.FS_price[getCamp])
-          let DocData = [transformedData.Games[getCamp], transformedData.FS[getCamp], transformedData.Restricts[getCamp], transformedData.FS_price[getCamp]]
 
-          let CmsData = ["-", data1[0].translations.title.no, data1[0].restrictedCountries, "-"]
+          let D = CheckCond(BoApi,CmsApi,transformedData, getCamp).DOCINFO
+          let DocData = [D.GamesCon[0], D.FSCon[0], D.RestrictsCon[0], D.AllowedCountryCon[0], D.FS_priceCon[0]]
+
+          let C = CheckCond(BoApi,CmsApi,transformedData).CMSINFO
+          let CmsData = ["-", CmsApi[0].translations.title.no, C.rectrictCondition[0], C.allowedCountryCond[0], "-"]
     
-          let freeSpinCondition = [
-            data2[0].additionalInfo.templates[0].freeSpinPrice && data2[0].additionalInfo.templates[0].freeSpinPrice['EUR'] !== undefined
-            ? data2[0].additionalInfo.templates[0].freeSpinPrice['EUR']
-            : '-'
-          ]
-          
-          console.log(CheckCond(data2))
-          console.log(freeSpinCondition[0])
-
-  
-          
-          let BOData = [data2[0].additionalInfo.templates[0].game, data2[0].additionalInfo.templates[0].freeSpinsAmount, '-', freeSpinCondition[0]]
+          let B = CheckCond(BoApi,CmsApi,transformedData).BOINFO     
+          let BOData = [B.gameCondition[0], B.freeSpinAmCondition[0], '-', '-', B.freeSpinCondition[0]]
     
           for (let i = 0; i < prop.length; i++) {
             const row = document.createElement('tr');
@@ -99,16 +93,16 @@ function getCampaign(CAMPAIGN, PROJECT) {
     
           }
 
-          translationsData(data1, data2)
+          translationsData(CmsApi, BoApi)
           
         })
         .catch(error => console.error(error));
 }
-
+//Функція що витягує інфу з доки
 function fetchdocdata() {
     const apiKey = 'AIzaSyDq2L4D73Y5E9jqyN3jk67b9xE-xzghqkE';
     const sheetId = '1Ki7_umFCqQvwWH-s9gExvnbomP3bUrYW3s0VTv5aIpg';
-    const range = 'A1:D7'; // Specify the range of data to retrieve
+    const range = 'A:AI'; // Specify the range of data to retrieve
     
     const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${range}?key=${apiKey}`
     
@@ -123,23 +117,23 @@ function fetchdocdata() {
         console.error('Error:', error);
       });
 }
-
-function translationsData(data1, data2) {
+//Функція що створює таблицю з описами
+function translationsData(CmsApi, BoApi) {
     
     const tableBody = document.getElementById('table-body-trans');
 
     
 
-    let languages = Object.keys(data1[0].translations.title).sort()
+    let languages = Object.keys(CmsApi[0].translations.title).sort()
 
 
 
-    let title = Object.values(getSortedTrans(data1[0].translations.title))
+    let title = Object.values(getSortedTrans(CmsApi[0].translations.title))
 
 
-    let shortdesc = Object.values(getSortedTrans(data1[0].translations.shortDescription))
+    let shortdesc = Object.values(getSortedTrans(CmsApi[0].translations.shortDescription))
     
-    let desc = Object.values(getSortedTrans(data1[0].translations.description))
+    let desc = Object.values(getSortedTrans(CmsApi[0].translations.description))
 
     
 
@@ -164,7 +158,7 @@ function translationsData(data1, data2) {
     }
 
 }
-
+//функція що сортує таблицю з описами по мовах
 function getSortedTrans(data) {
     const sortedKeys = Object.keys(data).sort();
     const sortedData = {}
@@ -175,7 +169,7 @@ function getSortedTrans(data) {
       return sortedData
 }
 
-
+//функція що форматує текст для таблиці з описами
 function formatAPIText(apiText) {
   const container = document.createElement('div');
   container.classList.add('cms-text');
@@ -203,26 +197,92 @@ function formatAPIText(apiText) {
 
   return container.innerHTML;
 }
-
+//Функція для очищення інпуту після натискання кнопки
 function clearInput() {
     document.getElementById('campaign-input').value = '';
   }
 
+//Функція для очищення таблиці при виклику нової кампанії
 function refreshTable() {
     const tableBody = document.getElementById('table-body');
     tableBody.innerHTML = '';
     const tableBody2 = document.getElementById('table-body-trans');
     tableBody2.innerHTML = '';
-  }
+}
 
-
-  function toggleTableVisibility() {
+//функція щоб сховати першу таблицю
+function toggleTableVisibility() {
     var table = document.getElementById("data-table");
     var heading = document.getElementById("campaign-heading");
     heading.classList.toggle("hidden");
     table.classList.toggle("hidden");
-  }
+}
 
+//Функція для перевірки інформації з цмс та бо, до прикладу, якщо фс в кампанії відсутні, то замість них в таблиці буде '-'
+function CheckCond(BoApi, CmsApi, transformedData, getCamp = '') {
+
+  let checker = {
+    BOINFO: {
+      freeSpinCondition: [
+        BoApi && BoApi[0] && BoApi[0].additionalInfo && BoApi[0].additionalInfo.templates &&
+        BoApi[0].additionalInfo.templates[0] && BoApi[0].additionalInfo.templates[0].freeSpinPrice &&
+        BoApi[0].additionalInfo.templates[0].freeSpinPrice['EUR'] !== undefined
+          ? BoApi[0].additionalInfo.templates[0].freeSpinPrice['EUR']
+          : '-'
+        ],
+      freeSpinAmCondition: [
+        BoApi && BoApi[0] && BoApi[0].additionalInfo && BoApi[0].additionalInfo.templates &&
+        BoApi[0].additionalInfo.templates[0] && BoApi[0].additionalInfo.templates[0].freeSpinsAmount !== undefined
+        ? BoApi[0].additionalInfo.templates[0].freeSpinsAmount
+        : '-'
+      ],
+      gameCondition: [
+        CmsApi && CmsApi[0] && CmsApi[0].additionalInfo && CmsApi[0].additionalInfo.templates &&
+        CmsApi[0].additionalInfo.templates[0] && CmsApi[0].additionalInfo.templates[0].game !== undefined
+        ? CmsApi[0].additionalInfo.templates[0].game
+        : '-'
+      ]
+    },
+
+    CMSINFO: {
+        rectrictCondition: [
+          CmsApi && CmsApi[0].restrictedCountries &&
+          CmsApi[0].restrictedCountries.length !== 0
+          ? CmsApi[0].restrictedCountries
+          : '-'
+        ],
+        allowedCountryCond: [
+          CmsApi && CmsApi[0].allowedCountries &&
+          CmsApi[0].allowedCountries.length !== 0
+          ? CmsApi[0].allowedCountries
+          : '-'
+        ]
+    },
+
+    DOCINFO: {
+      GamesCon: [
+        transformedData.GameName ? transformedData.GameName[getCamp] : '-'
+      ],
+      FSCon: [
+        transformedData.FS_count ?  transformedData.FS_count[getCamp] : '-'
+      ],
+      RestrictsCon: [
+        transformedData.Restricts ? transformedData.Restricts[getCamp] : '-'
+      ],
+      AllowedCountryCon: [
+        transformedData.Allowed ? transformedData.Allowed[getCamp] : '-'
+      ],
+      FS_priceCon: [
+        transformedData.Spin_Price ? transformedData.Spin_Price[getCamp] : '-'
+      ]
+
+    }
+
+        
+  }
+  
+  return checker
+}
 
 
 

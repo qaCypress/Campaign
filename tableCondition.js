@@ -1,7 +1,7 @@
 
-export default CheckCond
 
-function CheckCond(data2) {
+
+export function CheckCond(data2) {
 
     let checker = {
         freeSpinCondition : [

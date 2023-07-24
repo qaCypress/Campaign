@@ -1,7 +1,7 @@
-
+import {CheckCond} from "tableCodition.js";
 
 function getCampaign(CAMPAIGN, PROJECT) {
-
+  //Прив да-да
     clearInput()
     refreshTable();
     Promise.all([
@@ -71,6 +71,11 @@ function getCampaign(CAMPAIGN, PROJECT) {
             : '-'
           ]
           
+          console.log(CheckCond(data2))
+          console.log(freeSpinCondition[0])
+
+  
+          
           let BOData = [data2[0].additionalInfo.templates[0].game, data2[0].additionalInfo.templates[0].freeSpinsAmount, '-', freeSpinCondition[0]]
     
           for (let i = 0; i < prop.length; i++) {
@@ -103,7 +108,7 @@ function getCampaign(CAMPAIGN, PROJECT) {
 function fetchdocdata() {
     const apiKey = 'AIzaSyDq2L4D73Y5E9jqyN3jk67b9xE-xzghqkE';
     const sheetId = '1Ki7_umFCqQvwWH-s9gExvnbomP3bUrYW3s0VTv5aIpg';
-    const range = 'A:AF'; // Specify the range of data to retrieve
+    const range = 'A1:D7'; // Specify the range of data to retrieve
     
     const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${range}?key=${apiKey}`
     

@@ -1,22 +1,9 @@
 
 
 
+// Load the Google Sheets API library
+gapi.load('client', initClient);
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/*
 function initClient() {
     gapi.client.init({
       apiKey: 'AIzaSyAIoEE_zYqRZ8Ca_AmEOI8XX1-BEIY9lU0',
@@ -58,4 +45,4 @@ function loadSpreadsheetData() {
       console.log('Error loading data from spreadsheet:', error);
     });
   }
-*/
+

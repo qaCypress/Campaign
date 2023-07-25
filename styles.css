@@ -53,6 +53,9 @@ body {
   .translations-table {
     padding: 32px;
   }
+  .data-table {
+    padding: 32px;
+  }
   
   th, td {
     padding: 8px;
@@ -125,7 +128,29 @@ body {
     cursor: pointer;
   }
 
+  .data-table {
+    width: 100%;
+    overflow-x: auto;
+  }
 
+  .data-table table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .data-table th,
+  .data-table td {
+    padding: 8px;
+    text-align: left;
+    border: 1px solid #ddd;
+  }
+
+  @media screen and (max-width: 600px) {
+    .data-table th,
+    .data-table td {
+      padding: 5px;
+    }
+  }
 
 
 

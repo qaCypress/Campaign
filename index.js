@@ -238,9 +238,9 @@ function CheckCond(BoApi, CmsApi, transformedData, getCamp = '') {
         : '-'
       ],
       gameCondition: [
-        CmsApi && CmsApi[0] && CmsApi[0].additionalInfo && CmsApi[0].additionalInfo.templates &&
-        CmsApi[0].additionalInfo.templates[0] && CmsApi[0].additionalInfo.templates[0].game !== undefined
-        ? CmsApi[0].additionalInfo.templates[0].game
+        BoApi && BoApi[0] && BoApi[0].additionalInfo && BoApi[0].additionalInfo.templates &&
+        BoApi[0].additionalInfo.templates[0] && BoApi[0].additionalInfo.templates[0].game !== undefined
+        ? BoApi[0].additionalInfo.templates[0].game
         : '-'
       ]
     },

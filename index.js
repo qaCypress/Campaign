@@ -51,26 +51,27 @@ function getCampaign(CAMPAIGN, PROJECT) {
           // Populate the table with the merged data
           const tableBody = document.getElementById('table-body');
     
-          let prop = ["GameName", "FS_count", "Restricts", "Allowed", "Spin_Price"]
+          let prop = ["GameName", "FS_count", "Restricts", "Allowed", "Spin_Price", "Vager"]
 
           let getCamp = null
-          if(getCamp !== null) {
+          
             for (let i = 0; i < transformedData.Campaign.length; i++) {
               if (transformedData.Campaign[i] === CAMPAIGN) {
                 getCamp = i;
                 break;
               }
             }
-          }
+          
 
           let D = CheckCond(BoApi,CmsApi,transformedData, getCamp).DOCINFO
-          let DocData = [D.GamesCon[0], D.FSCon[0], D.RestrictsCon[0], D.AllowedCountryCon[0], D.FS_priceCon[0]]
+          console.log(getCamp)
+          let DocData = [D.GamesCon[0], D.FSCon[0], D.RestrictsCon[0], D.AllowedCountryCon[0], D.FS_priceCon[0], D.VagerCon[0]]
 
           let C = CheckCond(BoApi,CmsApi,transformedData).CMSINFO
-          let CmsData = ["-", CmsApi[0].translations.title.no, C.rectrictCondition[0], C.allowedCountryCond[0], "-"]
+          let CmsData = ["-", CmsApi[0].translations.title.no, C.rectrictCondition[0], C.allowedCountryCond[0], "-", "-"]
     
           let B = CheckCond(BoApi,CmsApi,transformedData).BOINFO     
-          let BOData = [B.gameCondition[0], B.freeSpinAmCondition[0], '-', '-', B.freeSpinCondition[0]]
+          let BOData = [B.gameCondition[0], B.freeSpinAmCondition[0], '-', '-', B.freeSpinCondition[0], "-"]
     
           for (let i = 0; i < prop.length; i++) {
             const row = document.createElement('tr');
@@ -274,6 +275,9 @@ function CheckCond(BoApi, CmsApi, transformedData, getCamp = '') {
       ],
       FS_priceCon: [
         transformedData.Spin_Price ? transformedData.Spin_Price[getCamp] : '-'
+      ],
+      VagerCon: [
+        transformedData.Vager ? transformedData.Vager[getCamp] : '-'
       ]
 
     }

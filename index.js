@@ -62,16 +62,16 @@ function getCampaign(CAMPAIGN, PROJECT) {
               }
             }
           
-
+          console.log(BoApi[0].additionalInfo.templates[0].wageringRequirement[0].requirement.percentage)
+          
           let D = CheckCond(BoApi,CmsApi,transformedData, getCamp).DOCINFO
-          console.log(getCamp)
           let DocData = [D.GamesCon[0], D.FSCon[0], D.RestrictsCon[0], D.AllowedCountryCon[0], D.FS_priceCon[0], D.VagerCon[0]]
 
           let C = CheckCond(BoApi,CmsApi,transformedData).CMSINFO
           let CmsData = ["-", CmsApi[0].translations.title.no, C.rectrictCondition[0], C.allowedCountryCond[0], "-", "-"]
     
           let B = CheckCond(BoApi,CmsApi,transformedData).BOINFO     
-          let BOData = [B.gameCondition[0], B.freeSpinAmCondition[0], '-', '-', B.freeSpinCondition[0], "-"]
+          let BOData = [B.gameCondition[0], B.freeSpinAmCondition[0], '-', '-', B.freeSpinCondition[0], getFirstTwoDigits(B.VagCon[0])]
     
           for (let i = 0; i < prop.length; i++) {
             const row = document.createElement('tr');
@@ -169,7 +169,10 @@ function getSortedTrans(data) {
 
       return sortedData
 }
-
+function getFirstTwoDigits(number) {
+  const numberAsString = number.toString();
+  return numberAsString.length === 1 ? numberAsString : numberAsString.slice(0, 2);
+}
 //функція що форматує текст для таблиці з описами
 function formatAPIText(apiText) {
   const container = document.createElement('div');
@@ -241,6 +244,12 @@ function CheckCond(BoApi, CmsApi, transformedData, getCamp = '') {
         BoApi && BoApi[0] && BoApi[0].additionalInfo && BoApi[0].additionalInfo.templates &&
         BoApi[0].additionalInfo.templates[0] && BoApi[0].additionalInfo.templates[0].game !== undefined
         ? BoApi[0].additionalInfo.templates[0].game
+        : '-'
+      ],
+      VagCon: [
+        BoApi && BoApi[0] && BoApi[0].additionalInfo && BoApi[0].additionalInfo.templates &&
+        BoApi[0].additionalInfo.templates[0].wageringRequirement[0].requirement.percentage !== undefined
+        ? BoApi[0].additionalInfo.templates[0].wageringRequirement[0].requirement.percentage
         : '-'
       ]
     },

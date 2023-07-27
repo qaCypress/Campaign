@@ -128,31 +128,29 @@ body {
     cursor: pointer;
   }
 
-  .data-table {
-    width: 100%;
+
+  .res-table {
+    width: 70%;
     overflow-x: auto;
   }
 
-  .data-table table {
+  .res-table table {
     width: 100%;
-    border-collapse: collapse;
   }
 
-  .data-table th,
-  .data-table td {
-    padding: 8px;
+  .res-table th,
+  .res-table td {
+    padding: px;
     text-align: left;
     border: 1px solid #ddd;
   }
 
   @media screen and (max-width: 600px) {
-    .data-table th,
-    .data-table td {
+    .res-table th,
+    .res-table td {
       padding: 5px;
     }
   }
-
-
 
 
   .responsive-table {
@@ -255,3 +253,5 @@ body {
     .show-all-data .hidden {
       display: inline; /* Change the display property to show the hidden elements */
     }
+
+    

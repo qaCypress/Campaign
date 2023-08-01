@@ -62,13 +62,13 @@ function getCampaign(CAMPAIGN, PROJECT) {
               }
             }
           
-          console.log(BoApi[0].additionalInfo.templates[0].wageringRequirement[0].requirement.percentage)
+          console.log(CheckCond(BoApi,CmsApi,transformedData).BOINFO.VagCon[0])
           
           let D = CheckCond(BoApi,CmsApi,transformedData, getCamp).DOCINFO
           let DocData = [D.GamesCon[0], D.FSCon[0], D.RestrictsCon[0], D.AllowedCountryCon[0], D.FS_priceCon[0], D.VagerCon[0]]
 
           let C = CheckCond(BoApi,CmsApi,transformedData).CMSINFO
-          let CmsData = ["-", CmsApi[0].translations.title.no, C.rectrictCondition[0], C.allowedCountryCond[0], "-", "-"]
+          let CmsData = ["-", CmsApi[0].translations.title.en, C.rectrictCondition[0], C.allowedCountryCond[0], "-", "-"]
     
           let B = CheckCond(BoApi,CmsApi,transformedData).BOINFO     
           let BOData = [B.gameCondition[0], B.freeSpinAmCondition[0], '-', '-', B.freeSpinCondition[0], getFirstTwoDigits(B.VagCon[0])]
@@ -171,7 +171,19 @@ function getSortedTrans(data) {
 }
 function getFirstTwoDigits(number) {
   const numberAsString = number.toString();
-  return numberAsString.length === 1 ? numberAsString : numberAsString.slice(0, 2);
+
+  if(numberAsString.length === 1){
+    return `x${numberAsString}`
+  } 
+  
+  if(numberAsString.length === 3) {
+    return `x${numberAsString.slice(0, 1)}`
+  } 
+  else {
+    return `x${numberAsString.slice(0, 2)}`
+  }
+
+  //return numberAsString.length === 1 ? `x${numberAsString}` : `x${numberAsString.slice(0, 1)}`;
 }
 //функція що форматує текст для таблиці з описами
 function formatAPIText(apiText) {
@@ -247,10 +259,7 @@ function CheckCond(BoApi, CmsApi, transformedData, getCamp = '') {
         : '-'
       ],
       VagCon: [
-        BoApi && BoApi[0] && BoApi[0].additionalInfo && BoApi[0].additionalInfo.templates &&
-        BoApi[0].additionalInfo.templates[0].wageringRequirement[0].requirement.percentage !== undefined
-        ? BoApi[0].additionalInfo.templates[0].wageringRequirement[0].requirement.percentage
-        : '-'
+        BoApi?.[0]?.additionalInfo?.templates?.[0]?.wageringRequirement?.[0]?.requirement?.percentage ?? '0'
       ]
     },
 

@@ -103,7 +103,7 @@ function getCampaign(CAMPAIGN, PROJECT) {
 function fetchdocdata() {
     const apiKey = 'AIzaSyDq2L4D73Y5E9jqyN3jk67b9xE-xzghqkE';
     const sheetId = '1Ki7_umFCqQvwWH-s9gExvnbomP3bUrYW3s0VTv5aIpg';
-    const range = 'A:AI'; // Specify the range of data to retrieve
+    const range = 'A:BC'; // Specify the range of data to retrieve
     
     const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${range}?key=${apiKey}`
     

@@ -62,7 +62,7 @@ function getCampaign(CAMPAIGN, PROJECT) {
               }
             }
           
-          console.log(BoApi[0].additionalInfo.templates[0].wageringRequirement[0].requirement.percentage)
+          console.log(CheckCond(BoApi,CmsApi,transformedData).BOINFO.VagCon[0])
           
           let D = CheckCond(BoApi,CmsApi,transformedData, getCamp).DOCINFO
           let DocData = [D.GamesCon[0], D.FSCon[0], D.RestrictsCon[0], '', D.AllowedCountryCon[0], D.FS_priceCon[0], D.VagerCon[0]]
@@ -103,7 +103,7 @@ function getCampaign(CAMPAIGN, PROJECT) {
 function fetchdocdata() {
     const apiKey = 'AIzaSyDq2L4D73Y5E9jqyN3jk67b9xE-xzghqkE';
     const sheetId = '1Ki7_umFCqQvwWH-s9gExvnbomP3bUrYW3s0VTv5aIpg';
-    const range = 'A:AI'; // Specify the range of data to retrieve
+    const range = 'A:BC'; // Specify the range of data to retrieve
     
     const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${range}?key=${apiKey}`
     
@@ -173,7 +173,19 @@ function getSortedTrans(data) {
 
 function getFirstTwoDigits(number) {
   const numberAsString = number.toString();
-  return numberAsString.length === 1 ? numberAsString : numberAsString.slice(0, 2);
+
+  if(numberAsString.length === 1){
+    return `x${numberAsString}`
+  } 
+  
+  if(numberAsString.length === 3) {
+    return `x${numberAsString.slice(0, 1)}`
+  } 
+  else {
+    return `x${numberAsString.slice(0, 2)}`
+  }
+
+  //return numberAsString.length === 1 ? `x${numberAsString}` : `x${numberAsString.slice(0, 1)}`;
 }
 
 //функція що форматує текст для таблиці з описами
@@ -263,10 +275,7 @@ function CheckCond(BoApi, CmsApi, transformedData, getCamp = '') {
         : '-'
       ],
       VagCon: [
-        BoApi && BoApi[0] && BoApi[0].additionalInfo && BoApi[0].additionalInfo.templates &&
-        BoApi[0].additionalInfo.templates[0].wageringRequirement[0].requirement.percentage !== undefined
-        ? BoApi[0].additionalInfo.templates[0].wageringRequirement[0].requirement.percentage
-        : '-'
+        BoApi?.[0]?.additionalInfo?.templates?.[0]?.wageringRequirement?.[0]?.requirement?.percentage ?? '0'
       ]
     },
 

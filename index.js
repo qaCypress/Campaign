@@ -71,7 +71,7 @@ function getCampaign(CAMPAIGN, PROJECT) {
           let CmsData = ["-", CmsApi[0].translations.title.no, C.rectrictCondition[0], C.currenciesCondition[0], C.allowedCountryCond[0], "-", "-"]
     
           let B = CheckCond(BoApi,CmsApi,transformedData).BOINFO     
-          let BOData = [B.gameCondition[0], B.freeSpinAmCondition[0], '-', ,'-', '-', B.freeSpinCondition[0], getFirstTwoDigits(B.VagCon[0])]
+          let BOData = [B.gameCondition[0], B.freeSpinAmCondition[0], '-', '-', '-', B.freeSpinCondition[0], getFirstTwoDigits(B.VagCon[0])]
     
           for (let i = 0; i < prop.length; i++) {
             const row = document.createElement('tr');

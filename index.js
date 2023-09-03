@@ -51,7 +51,7 @@ function getCampaign(CAMPAIGN, PROJECT) {
           // Populate the table with the merged data
           const tableBody = document.getElementById('table-body');
     
-          let prop = ["GameName", "FS_count", "Restricts", "Allowed", "Spin_Price", "Vager"]
+          let prop = ["GameName", "FS_count", "Restricts", "Currinces", "Allowed", "Spin_Price", "Vager",]
 
           let getCamp = null
           
@@ -65,13 +65,13 @@ function getCampaign(CAMPAIGN, PROJECT) {
           console.log(BoApi[0].additionalInfo.templates[0].wageringRequirement[0].requirement.percentage)
           
           let D = CheckCond(BoApi,CmsApi,transformedData, getCamp).DOCINFO
-          let DocData = [D.GamesCon[0], D.FSCon[0], D.RestrictsCon[0], D.AllowedCountryCon[0], D.FS_priceCon[0], D.VagerCon[0]]
+          let DocData = [D.GamesCon[0], D.FSCon[0], D.RestrictsCon[0], '', D.AllowedCountryCon[0], D.FS_priceCon[0], D.VagerCon[0]]
 
           let C = CheckCond(BoApi,CmsApi,transformedData).CMSINFO
-          let CmsData = ["-", CmsApi[0].translations.title.no, C.rectrictCondition[0], C.allowedCountryCond[0], "-", "-"]
+          let CmsData = ["-", CmsApi[0].translations.title.no, C.rectrictCondition[0], C.currenciesCondition[0], C.allowedCountryCond[0], "-", "-"]
     
           let B = CheckCond(BoApi,CmsApi,transformedData).BOINFO     
-          let BOData = [B.gameCondition[0], B.freeSpinAmCondition[0], '-', '-', B.freeSpinCondition[0], getFirstTwoDigits(B.VagCon[0])]
+          let BOData = [B.gameCondition[0], B.freeSpinAmCondition[0], '-', ,'-', '-', B.freeSpinCondition[0], getFirstTwoDigits(B.VagCon[0])]
     
           for (let i = 0; i < prop.length; i++) {
             const row = document.createElement('tr');
@@ -145,10 +145,10 @@ function translationsData(CmsApi, BoApi) {
         const ShortDesc = document.createElement('td');
         const Desc = document.createElement('td');
     
-        Lang.textContent = languages[i]
-        Title.innerHTML = formatAPIText(title[i])
-        ShortDesc.innerHTML = formatAPIText(shortdesc[i])
-        Desc.innerHTML = formatAPIText(desc[i]);
+        Lang.innerHTML = languages[i]
+        Title.innerHTML = formatAPIText(title[i], 35)
+        ShortDesc.innerHTML = formatAPIText(shortdesc[i], 35)
+        Desc.innerHTML = formatAPIText(desc[i], 35);
     
         row.appendChild(Lang);
         row.appendChild(Title);
@@ -159,6 +159,7 @@ function translationsData(CmsApi, BoApi) {
     }
 
 }
+
 //функція що сортує таблицю з описами по мовах
 function getSortedTrans(data) {
     const sortedKeys = Object.keys(data).sort();
@@ -169,12 +170,14 @@ function getSortedTrans(data) {
 
       return sortedData
 }
+
 function getFirstTwoDigits(number) {
   const numberAsString = number.toString();
   return numberAsString.length === 1 ? numberAsString : numberAsString.slice(0, 2);
 }
+
 //функція що форматує текст для таблиці з описами
-function formatAPIText(apiText) {
+function formatAPIText(apiText, highlightedNumber) {
   const container = document.createElement('div');
   container.classList.add('cms-text');
 
@@ -182,9 +185,6 @@ function formatAPIText(apiText) {
   const numberRegex = /\b\d+\b/g; // Regular expression to match numbers
 
   let modifiedText = apiText.replace(variableRegex, '<a class="variable" data-variable="$1" href="#">{$1}</a>');
-
-  // Replace numbers with highlighted numbers
-  modifiedText = modifiedText.replace(numberRegex, '<span class="highlighted-number">$&</span>');
 
   container.innerHTML = modifiedText;
 
@@ -199,8 +199,24 @@ function formatAPIText(apiText) {
     }
   });
 
+  // Find and highlight the specified number
+  const textNodes = Array.from(container.childNodes).filter(node => node.nodeType === Node.TEXT_NODE);
+  textNodes.forEach(node => {
+    const matches = node.nodeValue.match(numberRegex);
+    if (matches) {
+      node.nodeValue = node.nodeValue.replace(numberRegex, match => {
+        if (parseInt(match) === highlightedNumber) {
+          return ` <span class="highlighted-number green">${match}</span> `;
+        } else {
+          return ` <span class="highlighted-number">${match}</span> `;
+        }
+      });
+    }
+  });
+
   return container.innerHTML;
 }
+
 //Функція для очищення інпуту після натискання кнопки
 function clearInput() {
     document.getElementById('campaign-input').value = '';
@@ -266,7 +282,14 @@ function CheckCond(BoApi, CmsApi, transformedData, getCamp = '') {
           CmsApi[0].allowedCountries.length !== 0
           ? CmsApi[0].allowedCountries
           : '-'
-        ]
+        ],
+        currenciesCondition: [
+          CmsApi && CmsApi[0].allowedCurrencies &&
+          CmsApi[0].allowedCurrencies.length !== 0
+          ? CmsApi[0].allowedCurrencies
+          : '-'
+        ],
+        
     },
 
     DOCINFO: {

@@ -187,7 +187,7 @@ function getFirstTwoDigits(number) {
 
   //return numberAsString.length === 1 ? `x${numberAsString}` : `x${numberAsString.slice(0, 1)}`;
 }
-
+//test
 //функція що форматує текст для таблиці з описами
 function formatAPIText(BoApi, apiText) {
   const container = document.createElement('div');

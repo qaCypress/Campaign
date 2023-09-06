@@ -146,9 +146,9 @@ function translationsData(CmsApi, BoApi) {
         const Desc = document.createElement('td');
     
         Lang.innerHTML = languages[i]
-        Title.innerHTML = formatAPIText(title[i], 35)
-        ShortDesc.innerHTML = formatAPIText(shortdesc[i], 35)
-        Desc.innerHTML = formatAPIText(desc[i], 35);
+        Title.innerHTML = formatAPIText(BoApi, title[i])
+        ShortDesc.innerHTML = formatAPIText(BoApi, shortdesc[i])
+        Desc.innerHTML = formatAPIText(BoApi, desc[i]);
     
         row.appendChild(Lang);
         row.appendChild(Title);
@@ -189,14 +189,19 @@ function getFirstTwoDigits(number) {
 }
 
 //функція що форматує текст для таблиці з описами
-function formatAPIText(apiText, highlightedNumber) {
+function formatAPIText(BoApi, apiText) {
   const container = document.createElement('div');
   container.classList.add('cms-text');
 
   const variableRegex = /{%\s*"(.*?)":\s*"(.*?)".*?%}/g;
-  const numberRegex = /\b\d+\b/g; // Regular expression to match numbers
+
+  let B = CheckCond(BoApi,'-','-').BOINFO
+  const numberRegex = B.freeSpinAmCondition[0]; // Regular expression to match numbers
 
   let modifiedText = apiText.replace(variableRegex, '<a class="variable" data-variable="$1" href="#">{$1}</a>');
+
+  // Replace numbers with highlighted numbers
+  modifiedText = modifiedText.replace(numberRegex, '<span class="highlighted-number">$&</span>');
 
   container.innerHTML = modifiedText;
 
@@ -204,24 +209,9 @@ function formatAPIText(apiText, highlightedNumber) {
     const target = event.target;
     if (target.classList.contains('variable')) {
       const variable = target.getAttribute('data-variable');
-      const variableElements = container.querySelectorAll(`a.variable[data-variable="${variable}"]`);
+      const variableElements = container.querySelectorAll(`span[data-variable="${variable}"]`);
       variableElements.forEach(function(element) {
-        element.nextElementSibling.classList.toggle('hidden');
-      });
-    }
-  });
-
-  // Find and highlight the specified number
-  const textNodes = Array.from(container.childNodes).filter(node => node.nodeType === Node.TEXT_NODE);
-  textNodes.forEach(node => {
-    const matches = node.nodeValue.match(numberRegex);
-    if (matches) {
-      node.nodeValue = node.nodeValue.replace(numberRegex, match => {
-        if (parseInt(match) === highlightedNumber) {
-          return ` <span class="highlighted-number green">${match}</span> `;
-        } else {
-          return ` <span class="highlighted-number">${match}</span> `;
-        }
+        element.classList.toggle('hidden');
       });
     }
   });

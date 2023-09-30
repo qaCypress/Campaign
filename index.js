@@ -51,7 +51,7 @@ function getCampaign(CAMPAIGN, PROJECT) {
           // Populate the table with the merged data
           const tableBody = document.getElementById('table-body');
     
-          let prop = ["GameName", "FS_count", "Restricts", "Currinces", "Allowed", "Spin_Price", "Vager",]
+          let prop = ["GameName", "FS_count", "Restricts", "Currinces", "Allowed", "Spin_Price", "Vager", "Loyality_Points"]
 
           let getCamp = null
           
@@ -65,13 +65,13 @@ function getCampaign(CAMPAIGN, PROJECT) {
           console.log(CheckCond(BoApi,CmsApi,transformedData).BOINFO.VagCon[0])
           
           let D = CheckCond(BoApi,CmsApi,transformedData, getCamp).DOCINFO
-          let DocData = [D.GamesCon[0], D.FSCon[0], D.RestrictsCon[0], '', D.AllowedCountryCon[0], D.FS_priceCon[0], D.VagerCon[0]]
+          let DocData = [D.GamesCon[0], D.FSCon[0], D.RestrictsCon[0], '', D.AllowedCountryCon[0], D.FS_priceCon[0], D.VagerCon[0], '']
 
           let C = CheckCond(BoApi,CmsApi,transformedData).CMSINFO
-          let CmsData = ["-", CmsApi[0].translations.title.no, C.rectrictCondition[0], C.currenciesCondition[0], C.allowedCountryCond[0], "-", "-"]
+          let CmsData = ["-", CmsApi[0].translations.title.no, C.rectrictCondition[0], C.currenciesCondition[0], C.allowedCountryCond[0], "-", "-", "-"]
     
           let B = CheckCond(BoApi,CmsApi,transformedData).BOINFO     
-          let BOData = [B.gameCondition[0], B.freeSpinAmCondition[0], '-', '-', '-', B.freeSpinCondition[0], getFirstTwoDigits(B.VagCon[0])]
+          let BOData = [B.gameCondition[0], B.freeSpinAmCondition[0], '-', '-', '-', B.freeSpinCondition[0], getFirstTwoDigits(B.VagCon[0]), B.LoyAlPoints[0]]
     
           for (let i = 0; i < prop.length; i++) {
             const row = document.createElement('tr');
@@ -243,29 +243,41 @@ function toggleTableVisibility() {
 //Функція для перевірки інформації з цмс та бо, до прикладу, якщо фс в кампанії відсутні, то замість них в таблиці буде '-'
 function CheckCond(BoApi, CmsApi, transformedData, getCamp = '') {
 
+  const temPlateIndex = BoApi?.[0]?.additionalInfo?.templates?.length === 1 ? 0 : 1;
+
+  let LoyalPoint = 0;
+
+  const templates = BoApi[0].additionalInfo.templates;
+
+  for (const template of templates) {
+    const loyaltyPointsKey = Object.keys(template).find((key) => key.includes("LOYALTY-POINT-TPL"));
+    if (loyaltyPointsKey) {
+      const loyaltyPoints = template[loyaltyPointsKey];
+      if (loyaltyPoints && Array.isArray(loyaltyPoints)) {
+        LoyalPoint = loyaltyPoints[0].amount;
+        //console.log('Loyalty Points Amount:', LoyalPoint);
+        break; // Stop after finding the first occurrence
+      }
+    }
+  }
+  
+
   let checker = {
     BOINFO: {
       freeSpinCondition: [
-        BoApi && BoApi[0] && BoApi[0].additionalInfo && BoApi[0].additionalInfo.templates &&
-        BoApi[0].additionalInfo.templates[0] && BoApi[0].additionalInfo.templates[0].freeSpinPrice &&
-        BoApi[0].additionalInfo.templates[0].freeSpinPrice['EUR'] !== undefined
-          ? BoApi[0].additionalInfo.templates[0].freeSpinPrice['EUR']
-          : '-'
+        BoApi?.[0]?.additionalInfo?.templates?.[temPlateIndex]?.freeSpinPrice?.EUR ?? '-'
         ],
       freeSpinAmCondition: [
-        BoApi && BoApi[0] && BoApi[0].additionalInfo && BoApi[0].additionalInfo.templates &&
-        BoApi[0].additionalInfo.templates[0] && BoApi[0].additionalInfo.templates[0].freeSpinsAmount !== undefined
-        ? BoApi[0].additionalInfo.templates[0].freeSpinsAmount
-        : '-'
+        BoApi?.[0]?.additionalInfo?.templates?.[temPlateIndex]?.freeSpinsAmount ?? '-'
       ],
       gameCondition: [
-        BoApi && BoApi[0] && BoApi[0].additionalInfo && BoApi[0].additionalInfo.templates &&
-        BoApi[0].additionalInfo.templates[0] && BoApi[0].additionalInfo.templates[0].game !== undefined
-        ? BoApi[0].additionalInfo.templates[0].game
-        : '-'
+        BoApi?.[0]?.additionalInfo?.templates?.[temPlateIndex]?.game ?? '-'
       ],
       VagCon: [
-        BoApi?.[0]?.additionalInfo?.templates?.[0]?.wageringRequirement?.[0]?.requirement?.percentage ?? '0'
+        BoApi?.[0]?.additionalInfo?.templates?.[temPlateIndex]?.wageringRequirement?.[0]?.requirement?.percentage ?? '0'
+      ],
+      LoyAlPoints: [
+        LoyalPoint === 0 ? '-' : LoyalPoint
       ]
     },
 

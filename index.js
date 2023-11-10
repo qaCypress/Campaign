@@ -22,7 +22,7 @@ function getCampaign(CAMPAIGN, PROJECT) {
               })
 
               const transformedData = {};
-
+              console.log( DocApi.length)
               // Iterate over the data rows starting from index 1
               for (let i = 1; i < DocApi.length; i++) {
                 const row = DocApi[i];
@@ -97,7 +97,7 @@ function getCampaign(CAMPAIGN, PROJECT) {
           translationsData(CmsApi, BoApi)
           
         })
-        .catch(error => console.error(error));
+        
 }
 //Функція що витягує інфу з доки
 function fetchdocdata() {
@@ -249,17 +249,21 @@ function CheckCond(BoApi, CmsApi, transformedData, getCamp = '') {
 
   const templates = BoApi[0].additionalInfo.templates;
 
-  for (const template of templates) {
-    const loyaltyPointsKey = Object.keys(template).find((key) => key.includes("LOYALTY-POINT-TPL"));
-    if (loyaltyPointsKey) {
-      const loyaltyPoints = template[loyaltyPointsKey];
-      if (loyaltyPoints && Array.isArray(loyaltyPoints)) {
-        LoyalPoint = loyaltyPoints[0].amount;
-        //console.log('Loyalty Points Amount:', LoyalPoint);
-        break; // Stop after finding the first occurrence
+
+  if(templates) {
+    for (const template of templates) {
+      const loyaltyPointsKey = Object.keys(template).find((key) => key.includes("LOYALTY-POINT-TPL"));
+      if (loyaltyPointsKey) {
+        const loyaltyPoints = template[loyaltyPointsKey];
+        if (loyaltyPoints && Array.isArray(loyaltyPoints)) {
+          LoyalPoint = loyaltyPoints[0].amount;
+          //console.log('Loyalty Points Amount:', LoyalPoint);
+          break; // Stop after finding the first occurrence
+        }
       }
     }
   }
+
   
 
   let checker = {
